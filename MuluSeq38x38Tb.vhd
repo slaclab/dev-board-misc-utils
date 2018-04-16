@@ -11,6 +11,7 @@ architecture Impl of MuluSeq38x38Tb is
 
    signal a : unsigned(37 downto 0) := x"1234_5678_9" & "00";
    signal b : unsigned(37 downto 0) := x"a987_6543_2" & "00";
+   signal c : unsigned(37 downto 0) := (others => '0');
 
    signal p,ph : unsigned(37 downto 0);
 
@@ -22,11 +23,13 @@ architecture Impl of MuluSeq38x38Tb is
 
    signal cnt     : natural := 0;
 
+   signal rst     : std_logic := '1';
+
    impure function check return boolean is
       variable dif, exp : unsigned(37 downto 0);
       variable rval     : boolean;
    begin
-      exp := resize( shift_right( a*b, 38 ), 38 );
+      exp := resize( shift_right( a*b, 38 ), 38 ) + c;
       if ( p > exp ) then
          dif := p - exp;
       else
@@ -54,6 +57,9 @@ begin
       if ( rising_edge( clk ) ) then
          v := cnt + 1;
          case (cnt) is
+            when 2 =>
+               rst <= '0';
+
             when 4 =>
                t <= '1';
             when 8 =>
@@ -68,6 +74,7 @@ begin
             when 9  =>
                a <= x"40444_4321" & "11";
                b <= x"5aa5a_a5a5" & "01";
+               c <= x"12345_6780" & "00";
                t <= '1';
                assert p = ph severity failure;
 
@@ -94,10 +101,11 @@ begin
    U_DUT : entity work.MuluSeq38x38
       port map (
          clk => clk,
-         rst => '0',
+         rst => rst,
          trg => t,
          a   => a,
          b   => b,
+         c   => c,
          p   => p,
          don => d
       );

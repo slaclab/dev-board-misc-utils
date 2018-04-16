@@ -37,13 +37,14 @@ entity MuluSeq38x38 is
       trg    : in  std_logic;
       a      : in  unsigned(37 downto 0);
       b      : in  unsigned(37 downto 0);
+      c      : in  unsigned(37 downto 0) := (others => '0');
       p      : out unsigned(37 downto 0);
       don    : out std_logic
    );
 end entity MuluSeq38x38;
 
 architecture Impl of MuluSeq38x38 is
-   type StateType is (TRIG, AHBL, AHBM, ALBH, AHBH, DONE);
+   type StateType is (TRIG, AHBL, AHBM, ALBH, AHBH, CADD, DONE);
 
    type RegType is record
       state : StateType;
@@ -52,6 +53,7 @@ architecture Impl of MuluSeq38x38 is
       bh    : unsigned(16 downto 0);
       bm    : unsigned(16 downto 0);
       s17   : std_logic;
+      z     : std_logic;
    end record RegType;
 
    constant REG_INIT_C : RegType := (
@@ -60,7 +62,8 @@ architecture Impl of MuluSeq38x38 is
       al    =>  (others => '0'),
       bh    =>  (others => '0'),
       bm    =>  (others => '0'),
-      s17   =>  '0'
+      s17   =>  '0',
+      z     =>  '0'
    );
 
    signal r    : RegType := REG_INIT_C;
@@ -141,23 +144,28 @@ begin
          v.bh    := bh;
          v.bm    := bm;
          v.s17   := '0';
+         v.z     := '0';
          v.state := TRIG;
       else
          case ( r.state ) is
             when TRIG =>
                v.state := AHBL;
+               v.s17   := '1';
             when AHBL =>
                v.state := AHBM;
-               v.s17   := '1';
+               v.s17   := '0';
             when AHBM =>
                v.state := ALBH;
-               v.s17   := '0';
+               v.s17   := '1';
             when ALBH =>
                v.state := AHBH;
-               v.s17   := '1';
-            when AHBH =>
-               v.state := DONE;
                v.s17   := '0';
+               v.z     := '1';
+            when AHBH =>
+               v.state := CADD;
+               v.z     := '0';
+            when CADD =>
+               v.state := DONE;
             when DONE =>
          end case;
       end if;
@@ -178,15 +186,19 @@ begin
 
    U_DSP : entity work.MuluSeq21x17Dsp
       generic map (
-         TPD_G           => TPD_G,
-         RESET_PM_ONLY_G => true
+         TPD_G           => TPD_G
       )
       port map (
          clk             => clk,
-         rst             => trg,
+         rst             => rst,
+         rstpm           => trg,
          s17             => r.s17,
+         z               => r.z,
          a               => muxA,
          b               => muxB,
+         c(46 downto 38) => (others => '0'),
+         c(37 downto  0) => c,
+         cec             => trg,
          p               => pLoc         
       );
 
