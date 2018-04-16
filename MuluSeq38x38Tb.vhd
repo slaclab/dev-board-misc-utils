@@ -81,6 +81,7 @@ begin
                end if;
 
             when 20 =>
+               report "TEST PASSED";
                running <= false; 
 
             when others =>
