@@ -105,7 +105,7 @@ begin
             bl'length
          );
 
-   P_MUX : process ( trg, r ) is
+   P_MUX : process ( trg, r, ah, al, bh, bm, bl ) is
       variable vA : unsigned(20 downto 0);
       variable vB : unsigned(16 downto 0);
    begin
@@ -133,7 +133,7 @@ begin
       muxB <= vB;
    end process P_MUX;
 
-   P_CMB : process ( a, b, trg, r ) is
+   P_CMB : process ( a, b, trg, r, ah, al, bh, bm, bl ) is
       variable v: RegType;
    begin
       v   := r;
