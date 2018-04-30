@@ -21,7 +21,7 @@ entity MuluSeq21x17Dsp is
    );
 end entity MuluSeq21x17Dsp;
 
-architecture Impl of MuluSeq21x17Dsp is
+architecture Inferred of MuluSeq21x17Dsp is
    type RegType is record
       a  : signed(21 downto 0);
       b  : signed(17 downto 0);
@@ -92,4 +92,4 @@ begin
 
    p <= unsigned( resize(r.p, p'length) );
 
-end architecture Impl;
+end architecture Inferred;

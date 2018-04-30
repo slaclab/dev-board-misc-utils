@@ -23,7 +23,7 @@ entity MuluSeq21x17Dsp is
    );
 end entity MuluSeq21x17Dsp;
 
-architecture Impl of MuluSeq21x17Dsp is
+architecture DspWrapper of MuluSeq21x17Dsp is
 
    signal a_i : std_logic_vector(29 downto 0);
    signal b_i : std_logic_vector(17 downto 0);
@@ -118,4 +118,4 @@ begin
          RSTP           => rpm        -- in  std_ulogic
       );
 
-end architecture Impl;
+end architecture DspWrapper;
