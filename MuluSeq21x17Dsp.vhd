@@ -4,8 +4,7 @@ use ieee.numeric_std.all;
 
 entity MuluSeq21x17Dsp is
    generic (
-      TPD_G           : time    := 1 ns;
-      RESET_PM_ONLY_G : boolean := false
+      TPD_G           : time    := 1 ns
    );
    port (
       clk    : in  std_logic;
@@ -82,7 +81,7 @@ begin
          v := rin;
          if ( rst = '1' ) then
             v   := REG_INIT_C;
-         elsif ( rstmp = '1' ) then
+         elsif ( rstpm = '1' ) then
             v.m := (others => '0');
             v.p := (others => '0');
          end if;
