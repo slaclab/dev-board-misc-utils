@@ -184,7 +184,7 @@ begin
       end if;
    end process P_SEQ;
 
-   U_DSP : entity work.MuluSeq21x17Dsp
+   U_DSP : entity work.MuluSeq21x17Dsp(DspWrapper)
       generic map (
          TPD_G           => TPD_G
       )
