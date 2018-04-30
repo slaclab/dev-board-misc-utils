@@ -199,8 +199,8 @@ architecture TimingClkSwitcherImpl of TimingClkSwitcher is
    signal   mulDon        : sl;
    signal   newFreq       : sl;
 
-   signal   rdRegs        : Slv32Array(0 to NUM_RD_REGS_C - 1) := (others => (others => '0') );
-   signal   wrRegs        : Slv32Array(0 to NUM_WR_REGS_C - 1);
+   signal   rdRegs        : Slv32Array(NUM_RD_REGS_C - 1 downto 0) := (others => (others => '0') );
+   signal   wrRegs        : Slv32Array(NUM_WR_REGS_C - 1 downto 0);
 begin
    -- splice in run-time values
    seqProg( PC_INIT_C ).req.wrData(7 downto 0)   <= r.tcaVal;
