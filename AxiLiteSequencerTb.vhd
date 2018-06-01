@@ -188,7 +188,7 @@ begin
          axilReadSlave   => axilReadSlave
       );
 
-   U_SLV : entity work.AxiLiteEmpty
+   U_SLV : entity work.AxiLiteRegs
       generic map (
          NUM_WRITE_REG_G => 4,
          NUM_READ_REG_G  => 4

@@ -381,7 +381,7 @@ begin
          axilWriteSlave  => mAxilWriteSlave
       );
 
-   U_SLV : entity work.AxiLiteEmpty
+   U_SLV : entity work.AxiLiteRegs
       generic map (
          TPD_G           => TPD_G,
          NUM_WRITE_REG_G => NUM_WR_REGS_C,
