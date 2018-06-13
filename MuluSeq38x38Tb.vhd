@@ -98,7 +98,7 @@ begin
    end process P_CNT;
 
 
-   U_DUT : entity work.MuluSeq38x38
+   U_DUT : entity work.MuluSeq38x38(SeqImpl)
       port map (
          clk => clk,
          rst => rst,
