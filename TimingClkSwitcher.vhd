@@ -345,7 +345,7 @@ begin
       end if;
    end process P_SEQ;
 
-   U_MUL : entity work.MuluSeq38x38
+   U_MUL : entity work.MuluSeq38x38(SeqImpl)
       generic map (
          TPD_G   => TPD_G
       )
