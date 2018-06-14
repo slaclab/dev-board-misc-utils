@@ -38,6 +38,7 @@ entity TimingClkSwitcher is
       clkSel                 : in  sl;
 
       txRst                  : out sl;
+      rxRst                  : out sl;
 
       mAxilReadMaster        : out AxiLiteReadMasterType;
       mAxilReadSlave         : in  AxiLiteReadSlaveType;
@@ -407,5 +408,6 @@ begin
 
    newFreq <= wrRegs(WR_REG_CTRL_C)(0);
    txRst   <= r.txreset or wrRegs(WR_REG_CTRL_C)(1);
+   rxRst   <= r.txreset;
 
 end architecture TimingClkSwitcherImpl;
