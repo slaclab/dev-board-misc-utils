@@ -1,19 +1,28 @@
 -------------------------------------------------------------------------------
 -- File       : TimingClkSwitcher.vhd
 -- Company    : SLAC National Accelerator Laboratory
--- Created    : 2016-03-08
--- Last update: 2016-03-09
 -------------------------------------------------------------------------------
 -- Description: Switch Timing GTH Si570 Reference Clock
 -------------------------------------------------------------------------------
--- This file is part of SLAC Firmware Standard Library. It is subject to
--- the license terms in the LICENSE.txt file found in the top-level directory
--- of this distribution and at:
---    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html.
--- No part of SLAC Firmware Standard Library, including this file, may be
--- copied, modified, propagated, or distributed except according to the terms
--- contained in the LICENSE.txt file.
+-- This file is part of 'Development Board Misc. Utilities Library'
+-- It is subject to the license terms in the LICENSE.txt file found in the 
+-- top-level directory of this distribution and at: 
+--    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html. 
+-- No part of 'Development Board Misc. Utilities Library', including this file, 
+-- may be copied, modified, propagated, or distributed except according to 
+-- the terms contained in the LICENSE.txt file.
 -------------------------------------------------------------------------------
+
+-- State machine that 
+--   1) resets the SI570 to factory settings (during initialization)
+--   2) reads back and stores the factory trimmed parameters (which yield 156.25MHz)
+--   3) monitors clkSel and switches the SI570 to generate
+--       2*1300/7 MHz when '1' ("LCLS-2" mode)
+--       2*119    MHz when '0' ("LCLS-1" mode)
+--      each time the state of clkSel changes.
+--
+-- The generated clock is used as a reference for an SFP/GTH transceiver 
+-- for common-platform timing.
 
 library ieee;
 use ieee.std_logic_1164.all;
