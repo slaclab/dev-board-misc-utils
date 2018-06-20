@@ -74,10 +74,11 @@ architecture Impl of AxilFancontroller is
    signal rin            : RegType;
 
    signal monTemp        : slv(15 downto 0);
+   signal ovr            : sl;
    
 begin
 
-   P_COMB : process ( r, sAxilReadMaster, sAxilWriteMaster, monTemp, sysmonAlarm ) is
+   P_COMB : process ( r, sAxilReadMaster, sAxilWriteMaster, monTemp, sysmonAlarm, ovr ) is
       variable v    : RegType;
       variable ep   : AxiLiteEndPointType;
       variable r1   : slv(31 downto 0);
@@ -86,7 +87,7 @@ begin
 
       axiSlaveWaitTxn(ep, sAxilWriteMaster, sAxilReadMaster, v.wrSlv, v.rdSlv);
 
-      axiSlaveRegisterR(ep, X"0", 0, x"000" & "000" & sysmonAlarm & monTemp);
+      axiSlaveRegisterR(ep, X"0", 0, x"000" & "00" & ovr & sysmonAlarm & monTemp);
 
       axiSlaveRegister (ep, X"4", 0, v.r1);
 
@@ -116,6 +117,7 @@ begin
          
          sysmonAlarm        => sysmonAlarm,
          monTemp            => monTemp,
+         multOverrange      => ovr,
          fanPwm             => fanPwm
       );
 

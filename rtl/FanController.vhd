@@ -55,6 +55,7 @@ entity FanController is
       bypass             : in  sl := '0';
       refTemp            : in  slv(15 downto 0);
       sysmonAlarm        : in  sl := '1';
+      multOverrange      : out sl;
       monTemp            : out slv(15 downto 0); -- temp. ADC readback
       fanPwm             : out sl
    );
@@ -250,8 +251,9 @@ begin
          modOut          => pwmOut
       );
 
-   fanPwm  <= pwmOut or r.ovr or sysmonAlarm;
-   monTemp <= slv( r.temp );
+   fanPwm        <= pwmOut or r.ovr or sysmonAlarm;
+   monTemp       <= slv( r.temp );
+   multOverrange <= r.ovr;
 
    P_SEQ : process (axilClk) is
    begin
