@@ -47,7 +47,7 @@ architecture impl of FanControllerTb is
    signal ars : AxiLiteReadSlaveType;
 
    signal kp  : slv( 6 downto 0) := toSlv( 127, 7 );
-   signal ps  : slv( 3 downto 0) := toSlv(   2, 4 );
+   signal ps  : slv( 3 downto 0) := toSlv(   4, 4 );
    signal ref : slv(15 downto 0) := slv( temp2adc( 50.0 ) );
    signal rbk : slv(31 downto 0) := x"0000" & slv( temp2adc( 60.0 ) );
    signal bps : sl               := '1';

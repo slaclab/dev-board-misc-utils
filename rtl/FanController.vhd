@@ -107,7 +107,7 @@ architecture Impl of Fancontroller is
       trgRdbk => '0',
       trgMul  => '0',
       pw      => (others => '0'),
-      ovr     => '1'  -- fan initially on
+      ovr     => '1' -- fan initially on
    );
 
    signal rdbkDon        : sl;
@@ -137,28 +137,38 @@ begin
 
       case ( r.state ) is
          when IDLE =>
-            if ( bypass = '1' ) then
-               v.pw  := unsigned( speed );
-               v.ovr := '0';
-            else
-               if ( r.period = 0 ) then
-                  v.trgRdbk := '1';
-                  v.state   := RDBK;
-               end if;
+            if ( r.period = 0 ) then
+               v.trgRdbk := '1';
+               v.state   := RDBK;
             end if;
    
          when RDBK => 
+
             if ( rdbkDon = '1' ) then
-               v.temp    := unsigned(tempReadback(15 downto 0));
-               t         := unsigned(tempReadback(TEMP_W_C - 1 downto 0));
-               ti        := unsigned(refTemp     (TEMP_W_C - 1 downto 0));
-               if ( t <= ti ) then
-                  v.delTemp := (others => '0');
-               else
-                  v.delTemp := t - ti;
+               v.temp := unsigned(tempReadback(15 downto 0));
+            end if;
+
+            if ( bypass = '1' ) then
+               v.pw    := unsigned( speed );
+               v.ovr   := '0';
+               v.state := IDLE;
+            else
+               if ( r.period = 0 ) then
+                  -- no readback in a full feedback period!
+                  v.temp  := (others => '1');
+                  v.ovr   := '1';
+                  v.state := IDLE;
+               elsif ( rdbkDon = '1' ) then
+                  t       := unsigned(tempReadback(TEMP_W_C - 1 downto 0));
+                  ti      := unsigned(refTemp     (TEMP_W_C - 1 downto 0));
+                  if ( t <= ti ) then
+                     v.delTemp := (others => '0');
+                  else
+                     v.delTemp := t - ti;
+                  end if;
+                  v.shift := to_integer( unsigned(preshift) );
+                  v.state := SHFT;
                end if;
-               v.state := SHFT;
-               v.shift := to_integer( unsigned(preshift) );
             end if;
 
          when SHFT =>
@@ -216,7 +226,7 @@ begin
          clk             => axilClk,
          rst             => axilRst,
          trg             => r.trgMul,
-         a               => r.delTemp(MULU_W_C - 1 downto 0),
+         a               => r.delTemp(TEMP_W_C - 1 downto TEMP_W_C - MULU_W_C),
          b               => unsigned( kp(MULU_W_C - 1 downto 0) ),
          c               => to_unsigned( 0, MULU_W_C),
          p               => prod,
