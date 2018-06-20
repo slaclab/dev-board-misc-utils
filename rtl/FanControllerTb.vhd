@@ -18,6 +18,7 @@ use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 
 use work.StdRtlPkg.all;
+use work.TextUtilPkg.all;
 use work.AxiLitePkg.all;
 
 entity FanControllerTb is
@@ -43,21 +44,38 @@ architecture impl of FanControllerTb is
    signal pwm : std_logic;
 
    signal sm  : sl := '0';
-   signal arm : AxiLiteReadMasterType;
-   signal ars : AxiLiteReadSlaveType;
+   signal mArm : AxiLiteReadMasterType;
+   signal mArs : AxiLiteReadSlaveType;
+   signal sArm : AxiLiteReadMasterType  := AXI_LITE_READ_MASTER_INIT_C;
+   signal sArs : AxiLiteReadSlaveType;
+   signal sAwm : AxiLiteWriteMasterType := AXI_LITE_WRITE_MASTER_INIT_C;
+   signal sAws : AxiLiteWriteSlaveType;
 
    signal kp  : slv( 6 downto 0) := toSlv( 127, 7 );
    signal ps  : slv( 3 downto 0) := toSlv(   4, 4 );
    signal ref : slv(15 downto 0) := slv( temp2adc( 50.0 ) );
    signal rbk : slv(31 downto 0) := x"0000" & slv( temp2adc( 60.0 ) );
-   signal bps : sl               := '1';
+   signal bps : sl               := '0';
    signal spd : slv( 3 downto 0) := x"f";
 
    constant RR_C : positive := 1;
 
    signal rr : Slv32Array(RR_C - 1  downto 0) := ( others => (others => '0') );
 
+   signal arm : AxiLiteReadMasterType;
+
 begin
+
+   P_PROG : process is
+      variable dat : slv(31 downto 0);
+   begin
+      wait until rst = '0';
+      axiLiteBusSimWrite( clk, sAwm, sAws, x"0000_0004", ref & ps & spd & bps & kp );
+      wait until cnt = 200;
+      axiLiteBusSimRead ( clk, sArm, sArs, x"0000_0000", dat, true );
+      print( str(dat) );
+      wait;
+   end process;
 
    P_CLK : process is
    begin
@@ -89,25 +107,25 @@ begin
 
    rr(0) <= rbk;
 
-   U_DUT : entity work.FanController
+   U_DUT : entity work.AxilFanController
       generic map (
          TPD_G              => TPD_C,
          SYSMON_BASE_ADDR_G => x"0000_0000",
          AXIL_FREQ_G        => 1600.0
       )
       port map (
-         axilClk        => clk,
-         axilRst        => rst,
-         axilReadMaster => arm,
-         axilReadSlave  => ars,
+         axilClk          => clk,
+         axilRst          => rst,
 
-         bypass         => bps,
-         speed          => spd,
-         kp             => kp,
-         preshift       => ps,
-         refTemp        => ref,
-         sysmonAlarm    => sm,
-         fanPwm         => pwm
+         mAxilReadMaster  => mArm,
+         mAxilReadSlave   => mArs,
+         sAxilReadMaster  => sArm,
+         sAxilReadSlave   => sArs,
+         sAxilWriteMaster => sAwm,
+         sAxilWriteSlave  => sAws,
+
+         sysmonAlarm      => sm,
+         fanPwm           => pwm
       );
 
    U_REGS : entity work.AxiLiteRegs
@@ -118,8 +136,8 @@ begin
       port map (
          axiClk         => clk,
          axiClkRst      => rst,
-         axiReadMaster  => arm,
-         axiReadSlave   => ars,
+         axiReadMaster  => mArm,
+         axiReadSlave   => mArs,
          axiWriteMaster => AXI_LITE_WRITE_MASTER_INIT_C,
          axiWriteSlave  => open,
          readRegister   => rr
