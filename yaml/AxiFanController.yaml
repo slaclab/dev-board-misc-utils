@@ -1,0 +1,76 @@
+##############################################################################
+## This file is part of 'dev-board-misc-utils'.
+## It is subject to the license terms in the LICENSE.txt file found in the 
+## top-level directory of this distribution and at: 
+##    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html. 
+## No part of 'dev-board-misc-utils', including this file, 
+## may be copied, modified, propagated, or distributed except according to 
+## the terms contained in the LICENSE.txt file.
+##############################################################################
+#schemaversion 3.0.0
+#once AxiFanController.yaml
+#
+
+AxiFanController: &AxiFanController
+  size: 0x00    10
+  class: MMIODev
+  children:
+    TemperatureADC:
+        class: IntField
+        mode:  RO
+        sizeBits: 16
+        signed: false
+        description: "Sysmon Temperature ADC Reading"
+        at: { offset: 0x0 }
+    SysMonAlarm:
+        class: IntField
+        mode:  RO
+        sizeBits: 1
+        lsBit: 0
+        description: "Over-Temperature Alarm"
+        at: { offset: 0x2 }
+    MultOverrange:
+        class: IntField
+        mode:  RO
+        sizeBits: 1
+        lsBit: 1
+        description: "Multiplier Overrange (forces full speed)"
+        at: { offset: 0x2 }
+    Kp:
+        class: IntField
+        mode:  RW
+        signed: false
+        sizeBits:  7
+        lsBit:     0
+        description: "Feedback Kp Coefficient (0..127)"
+        at: { offset: 0x4 }
+    Preshift:
+        class: IntField
+        mode:  RW
+        signed: false
+        sizeBits:  4
+        lsBit:     4
+        description: "Feedback Pre-shift: del =  (T-TargetT) << preshift"
+        at: { offset: 0x5 }
+    RefTempAdc:
+        class: IntField
+        mode:  RW
+        signed: false
+        sizeBits: 16
+        lsBit:     0
+        description: "Feedback Reference Temp. (Equivalent ADC)"
+        at: { offset: 0x6 }
+    Bypass:
+        class: IntField
+        mode:  RW
+        sizeBits:  1
+        lsBit:     7
+        description: "Feedback Bypass"
+        at: { offset: 0x4 }
+    Speed:
+        class: IntField
+        mode:  RW
+        sizeBits:  4
+        lsBit:     0
+        description: "Fan Speed (0..15) when Feedback Bypassed"
+        at: { offset: 0x5 }
