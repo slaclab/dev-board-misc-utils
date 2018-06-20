@@ -136,7 +136,9 @@ begin
       v.trgMul  := '0';
 
       case ( r.state ) is
+
          when IDLE =>
+
             if ( r.period = 0 ) then
                v.trgRdbk := '1';
                v.state   := RDBK;
@@ -144,23 +146,11 @@ begin
    
          when RDBK => 
 
-            if ( rdbkDon = '1' ) then
-               v.temp := unsigned(tempReadback(15 downto 0));
-            end if;
-
-            if ( bypass = '1' ) then
-               v.pw    := unsigned( speed );
-               v.ovr   := '0';
-               v.state := IDLE;
-            else
-               if ( r.period = 0 ) then
-                  -- no readback in a full feedback period!
-                  v.temp  := (others => '1');
-                  v.ovr   := '1';
-                  v.state := IDLE;
-               elsif ( rdbkDon = '1' ) then
-                  t       := unsigned(tempReadback(TEMP_W_C - 1 downto 0));
-                  ti      := unsigned(refTemp     (TEMP_W_C - 1 downto 0));
+            if ( rdbkDon = '1' or r.period = 0 ) then
+               if ( rdbkDon = '1' ) then
+                  v.temp := unsigned(tempReadback(15 downto 0));
+                  t      := unsigned(tempReadback(TEMP_W_C - 1 downto 0));
+                  ti     := unsigned(refTemp     (TEMP_W_C - 1 downto 0));
                   if ( t <= ti ) then
                      v.delTemp := (others => '0');
                   else
@@ -168,10 +158,21 @@ begin
                   end if;
                   v.shift := to_integer( unsigned(preshift) );
                   v.state := SHFT;
+               else
+                  -- no readback in a full feedback period!
+                  v.temp  := (others => '1');
+                  v.ovr   := '1';
+                  v.state := IDLE;
+               end if;
+               if ( bypass = '1' ) then
+                  v.pw    := unsigned( speed );
+                  v.ovr   := '0';
+                  v.state := IDLE;
                end if;
             end if;
 
          when SHFT =>
+
             if ( r.shift = 0 ) then
                v.trgMul := '1';
                v.state  := MULT;
@@ -187,10 +188,12 @@ begin
             end if;
 
          when MULT => 
+
             if ( mulDon = '1' ) then
                v.state := IDLE;
                v.pw    := prod(MULU_W_C - 1 downto MULU_W_C - PWM_W_C);
             end if;
+
       end case;
 
       rin <= v;
