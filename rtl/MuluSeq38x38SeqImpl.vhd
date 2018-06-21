@@ -30,7 +30,7 @@ begin
          trg      => trg,
          a        => a,
          b        => b,
-         d        => c,
+         c        => c,
          p        => p,
          don      => don
       );
