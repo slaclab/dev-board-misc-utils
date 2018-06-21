@@ -12,7 +12,7 @@
 #
 
 AxiFanController: &AxiFanController
-  size: 0x00    10
+  size: 0x00000010
   class: MMIODev
   children:
     TemperatureADC:
