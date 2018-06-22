@@ -50,10 +50,14 @@ architecture Impl of AxilFancontroller is
       return to_unsigned( integer(ieee.math_real.round((temp + 273.8195)/502.9098*65536)), 16);
    end function temp2adc;
 
-   constant DEF_TEMP_C     : real := 60.0;
+   constant DEF_TEMP_C     : real := 50.0;
 
    constant DEF_ADC_C      : slv(15 downto 0) := slv( temp2adc( DEF_TEMP_C ) );
-   constant DEF_PRESHIFT_C : slv( 3 downto 0) := toSlv(   0, 4);
+
+   -- the default preshift of 4 maxes out the 16-bit range at ~81deg
+   -- with a target-temperature of 50deg:
+   --   ((81-50)/503*2^16) << 4 = 64624
+   constant DEF_PRESHIFT_C : slv( 3 downto 0) := toSlv(   4, 4);
    constant DEF_BYPASS_C   : sl               := '1';
    constant DEF_SPEED_C    : slv( 3 downto 0) := (others => '1');
    constant DEF_KP_C       : slv( 6 downto 0) := toSlv(  60, 7);
