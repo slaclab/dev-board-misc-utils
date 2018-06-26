@@ -284,7 +284,7 @@ begin
                assert r7to12( 9) = x"d8" severity failure;
                assert r7to12(10) = x"01" severity failure;
                assert r7to12(11) = x"2a" severity failure;
-               assert r7to12(12) = x"30" severity failure;
+               assert r7to12(12) = x"31" severity failure;
                clkSel <= '0';
             else
                assert r7to12( 7) = x"E0" severity failure;
@@ -292,7 +292,7 @@ begin
                assert r7to12( 9) = x"dd" severity failure;
                assert r7to12(10) = x"0b" severity failure;
                assert r7to12(11) = x"69" severity failure;
-               assert r7to12(12) = x"b1" severity failure;
+               assert r7to12(12) = x"b2" severity failure;
                running <= false;
             end if;
          end if;
