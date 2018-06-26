@@ -246,6 +246,9 @@ begin
          O  => i2ci.sda
       );
 
+   sda <= 'H';
+   scl <= 'H';
+
    U_Slv : entity work.I2cRegSlave
       generic map (
          I2C_ADDR_G  => I2C_ADDR_C,
