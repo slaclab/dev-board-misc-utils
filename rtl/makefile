@@ -12,6 +12,7 @@ SRCS += MuluSeq38x38.vhd
 SRCS += MuluSeq38x38Tb.vhd
 SRCS += I2cPkg.vhd
 SRCS += TimingClkSwitcher.vhd
+SRCS += TimingClkSwitcherSi570.vhd
 SRCS += stdlib.vhd
 SRCS += I2cSlave.vhd
 SRCS += I2cRegSlave.vhd
