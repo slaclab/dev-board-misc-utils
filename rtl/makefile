@@ -17,6 +17,7 @@ SRCS += MuluSeq38x38SeqImpl.vhd
 SRCS += MuluSeq38x38Tb.vhd
 SRCS += I2cPkg.vhd
 SRCS += TimingClkSwitcher.vhd
+SRCS += TimingClkSwitcherSi5328.vhd
 SRCS += TimingClkSwitcherSi570.vhd
 SRCS += stdlib.vhd
 SRCS += I2cSlave.vhd
@@ -28,6 +29,7 @@ SRCS += I2cRegMaster.vhd
 SRCS += I2cRegMasterAxiBridge.vhd
 SRCS += AxiI2cRegMaster.vhd
 SRCS += TimingClkSwitcherSi570Tb.vhd
+SRCS += TimingClkSwitcherSi5328Tb.vhd
 
 VPATH  = surf/base/general/rtl
 VPATH += surf/axi/axi-lite/rtl
