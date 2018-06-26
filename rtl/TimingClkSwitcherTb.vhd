@@ -37,6 +37,8 @@ architecture impl of TimingClkSwitcherTb is
    constant I2C_SLV_C  : slv     := "1110100";
    constant I2C_ADDR_C : natural := to_integer(unsigned(I2C_SLV_C));
 
+   constant TPD_C      : time    := 0 ns;
+
    constant DEVMAP_C   : I2cAxiLiteDevArray := (
       0 => MakeI2cAxiLiteDevType( I2C_SLV_C, 8, 1, '1' ),
       1 => MakeI2cAxiLiteDevType( I2C_SLV_C, 8, 8, '1' )
@@ -154,9 +156,10 @@ begin
    end process P_RD;
 
 
-   U_DUT : entity work.TimingClkSwitcher
+   U_DUT : entity work.TimingClkSwitcher(TimingClkSwitcherSi570)
       generic map (
-         SI570_AXIL_BASE_ADDR_G => x"0000_0400",
+         TPD_G                  => TPD_C,
+         CLOCK_AXIL_BASE_ADDR_G => x"0000_0400",
          TCASW_AXIL_BASE_ADDR_G => x"0000_0000",
          AXIL_FREQ_G            => 6.0E2
       )
@@ -211,6 +214,7 @@ begin
 
    U_I2CM : entity work.AxiI2cRegMaster
       generic map (
+         TPD_G           => TPD_C,
          DEVICE_MAP_G    => DEVMAP_C,
          I2C_SCL_FREQ_G  => 1.0,
          I2C_MIN_PULSE_G => 0.1,
@@ -251,6 +255,7 @@ begin
 
    U_Slv : entity work.I2cRegSlave
       generic map (
+         TPD_G       => TPD_C,
          I2C_ADDR_G  => I2C_ADDR_C,
          ADDR_SIZE_G => AS_C,
          FILTER_G    => 2
