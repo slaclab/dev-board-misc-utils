@@ -18,6 +18,7 @@ use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 
 use work.StdRtlPkg.all;
+use work.TextUtilPkg.all;
 use work.AxiLitePkg.all;
 use work.AxiLiteMasterPkg.all;
 use work.I2cPkg.all;
@@ -35,22 +36,29 @@ architecture impl of TimingClkSwitcherSi5328Tb is
    constant AB_C       : natural := 8*AS_C;
    constant DB_C       : natural := 8*DS_C;
    constant I2C_SLV_C  : slv     := "1110100";
+   constant I2C_SLVM_C : slv     := "1110101";
    constant I2C_ADDR_C : natural := to_integer(unsigned(I2C_SLV_C));
 
    constant TPD_C      : time    := 0 ns;
 
    constant DEVMAP_C   : I2cAxiLiteDevArray := (
-      0 => MakeI2cAxiLiteDevType( I2C_SLV_C, 8, 1, '1' ),
+      0 => MakeI2cAxiLiteDevType( I2C_SLVM_C, 8, 1, '1' ),
       1 => MakeI2cAxiLiteDevType( I2C_SLV_C, 8, 8, '1' )
    );
 
    signal rama         : slv(AB_C-1 downto 0);
    signal wdat         : slv(DB_C-1 downto 0);
+   signal wdatTca      : slv(DB_C-1 downto 0);
+   signal rdatTca      : slv(DB_C-1 downto 0) := x"00";
    signal rdat         : slv(DB_C-1 downto 0) := x"a5";
    signal ren          : sl;
+   signal renTca       : sl;
    signal wen          : sl;
+   signal wenTca       : sl;
    signal i2ci         : i2c_in_type;
    signal i2co         : i2c_out_type;
+   signal i2ciTca      : i2c_in_type;
+   signal i2coTca      : i2c_out_type;
 
    signal iicClk       : sl := '0';
 
@@ -68,6 +76,7 @@ architecture impl of TimingClkSwitcherSi5328Tb is
 
    signal txRst        : sl;
    signal clkSel       : sl := '1';
+   signal clkSelLst    : sl := '0';
    signal txRstReg     : sl := '0';
 
    signal count        : integer := 0;
@@ -206,6 +215,32 @@ begin
          O  => i2ci.sda
       );
 
+   -- make sure the mux is set when talking to the clock
+   P_MUX_CHECKER : process ( i2co, i2ci, rdatTca, axilRst ) is
+   begin
+      if ( (i2co.sdaoen = '0' or i2co.scloen = '0') ) then
+         --  Attempting to write to slave but MUX not set!
+         assert rdatTca(4) = '1' severity failure;
+      end if;
+   end process P_MUX_CHECKER;
+
+   U_SCLBUFM : IOBUF
+      port map (
+         IO => scl,
+         I  => i2coTca.scl,
+         T  => i2coTca.scloen,
+         O  => i2ciTca.scl
+      );
+
+   U_SDABUFM : IOBUF
+      port map (
+         IO => sda,
+         I  => i2coTca.sda,
+         T  => i2coTca.sdaoen,
+         O  => i2ciTca.sda
+      );
+
+
    sda <= 'H';
    scl <= 'H';
 
@@ -228,6 +263,41 @@ begin
          i2ci   => i2ci,
          i2co   => i2co
       );
+
+   U_Tca : entity work.I2cRegSlave
+      generic map (
+         TPD_G       => TPD_C,
+         I2C_ADDR_G  => (I2C_ADDR_C+1),
+         ADDR_SIZE_G => 1,
+         FILTER_G    => 2
+      )
+      port map (
+         clk    => axilClk,
+
+         addr   => open,
+         wrEn   => wenTca,
+         wrData => wdatTca,
+         rdEn   => renTca,
+         rdData => rdatTca,
+
+         i2ci   => i2ciTca,
+         i2co   => i2coTca
+      );
+
+   P_MUX : process (axilClk) is
+   begin
+      if ( rising_edge( axilClk ) ) then
+         if ( clkSelLst /= clkSel ) then
+           rdatTca   <= (others => '0');
+           clkSelLst <= clkSel;
+           report "TCA Mux Reset (clkSel changed)";
+         elsif ( wenTca = '1' ) then
+           rdatTca <= wdatTca;
+           report "TCA Mux Written: str(wdatTca)";
+         end if;
+      end if;
+   end process P_MUX;
+
 
    P_CHECKER : process (axilClk) is
    begin

@@ -89,17 +89,20 @@ architecture TimingClkSwitcherSi5328 of TimingClkSwitcher is
        0 => tcaRd( true )
    );
 
+   constant PRG_WRITE_TCA_C: AxiLiteProgramArray := (
+       0 => tcaWr(     x"00", true  )
+   ); 
+
    constant PRG_INIT_C     : AxiLiteProgramArray := (
       -- initialize I2C MUX/SWITCH and Si5328
-       0 => tcaWr(     x"00", false ),
-       1 => clkWr(  0, x"54", false ), -- Free run
-       2 => clkWr(  1, x"e5", false ), -- CLK2 first + 2nd priority
-       3 => clkWr(  3, x"55", false ), -- manually select clk2
-       4 => clkWr(  5, x"2d", false ), -- Icmos 8mA/5mA (value from system controller)
-       5 => clkWr(  6, x"3f", false ), -- LVDS outputs  (value from system controller)
-       6 => clkWr(  7, x"28", false ), -- FOS alarm ref. Xa/Xb
-       7 => clkWr( 21, x"fc", false ), -- disable CS_CA (clock selection) pin
-       8 => clkWr( 55, x"1c", true  )  -- Clkinrate (1300/7*2, value from system controller)
+       0 => clkWr(  0, x"54", false ), -- Free run
+       1 => clkWr(  1, x"e5", false ), -- CLK2 first + 2nd priority
+       2 => clkWr(  3, x"55", false ), -- manually select clk2
+       3 => clkWr(  5, x"2d", false ), -- Icmos 8mA/5mA (value from system controller)
+       4 => clkWr(  6, x"3f", false ), -- LVDS outputs  (value from system controller)
+       5 => clkWr(  7, x"28", false ), -- FOS alarm ref. Xa/Xb
+       6 => clkWr( 21, x"fc", false ), -- disable CS_CA (clock selection) pin
+       7 => clkWr( 55, x"1c", true  )  -- Clkinrate (1300/7*2, value from system controller)
    );
 
    constant PRG_WRITE_LCLS_2_C    : AxiLiteProgramArray := (
@@ -146,21 +149,23 @@ architecture TimingClkSwitcherSi5328 of TimingClkSwitcher is
    );
 
    constant PROGRAM_C    : AxiLiteProgramArray := (
-     PRG_READ_TCA_C & PRG_INIT_C & PRG_WRITE_LCLS_2_C & PRG_WRITE_LCLS_1_C
+     PRG_READ_TCA_C & PRG_WRITE_TCA_C & PRG_INIT_C & PRG_WRITE_LCLS_2_C & PRG_WRITE_LCLS_1_C
    );
 
    constant PC_READ_TCA_C     : natural := 0;
-   constant PC_INIT_C         : natural := PC_READ_TCA_C      + PRG_READ_TCA_C'length;
+   constant PC_WRITE_TCA_C    : natural := PC_READ_TCA_C      + PRG_READ_TCA_C'length;
+   constant PC_INIT_C         : natural := PC_WRITE_TCA_C     + PRG_WRITE_TCA_C'length;
    constant PC_WRITE_LCLS_2_C : natural := PC_INIT_C          + PRG_INIT_C'length;
    constant PC_WRITE_LCLS_1_C : natural := PC_WRITE_LCLS_2_C  + PRG_WRITE_LCLS_2_C'length;
 
-   type StateType is (RESET, READ_TCA, INIT, WRITE, DELY, IDLE);
+   type StateType is (RESET, READ_TCA, WRITE_TCA, INIT, WRITE, DELY, IDLE);
 
    type RegType is record
       state      : StateType;
-      prevState  : StateType;
+      nextState  : StateType;
       tcaVal     : slv( 7 downto 0);
       pc         : natural;
+      nextPc     : natural;
       delay      : natural;
       trg        : sl;
       clkSel     : sl;
@@ -169,9 +174,10 @@ architecture TimingClkSwitcherSi5328 of TimingClkSwitcher is
 
    constant REG_INIT_C : RegType := (
       state      => RESET,
-      prevState  => IDLE,
+      nextState  => IDLE,
       tcaVal     => (others => '0'),
       pc         => PC_READ_TCA_C,
+      nextPc     =>  0,
       delay      =>  0,
       trg        => '0',
       clkSel     => '1',
@@ -197,7 +203,7 @@ architecture TimingClkSwitcherSi5328 of TimingClkSwitcher is
 begin
 
    -- splice in run-time values
-   seqProg( PC_INIT_C ).req.wrData(7 downto 0)   <= r.tcaVal;
+   seqProg( PC_WRITE_TCA_C ).req.wrData(7 downto 0)   <= r.tcaVal;
 
    P_COMB : process( clkSel, r, rs, don, rdData ) is
       variable v : RegType;
@@ -207,17 +213,26 @@ begin
 
       case ( r.state ) is
          when RESET =>
-            v.state := READ_TCA;
-            v.pc    := PC_READ_TCA_C;
-            v.trg   := '1';
+            v.state     := READ_TCA;
+            v.pc        := PC_READ_TCA_C;
+            v.nextState := INIT;
+            v.nextPc    := PC_INIT_C;
+            v.trg       := '1';
 
          when READ_TCA  =>
             if ( rs = '1' ) then
                v.tcaVal := rdData(7 downto 0) or x"10"; -- open i2c route to Si5328
             end if;
             if ( don = '1' and r.trg = '0' ) then
-               v.state := INIT;
-               v.pc    := PC_INIT_C;
+               v.state := WRITE_TCA;
+               v.pc    := PC_WRITE_TCA_C;
+               v.trg   := '1';
+            end if;
+
+         when WRITE_TCA =>
+            if ( don = '1' and r.trg = '0' ) then
+               v.pc    := r.nextPc;
+               v.state := r.nextState;
                v.trg   := '1';
             end if;
 
@@ -253,13 +268,15 @@ begin
          when IDLE =>
             if ( clkSel /= r.clkSel ) then
                if ( clkSel = '1' ) then
-                  v.pc := PC_WRITE_LCLS_2_C;
+                  v.nextPc := PC_WRITE_LCLS_2_C;
                else
-                  v.pc := PC_WRITE_LCLS_1_C;
+                  v.nextPc := PC_WRITE_LCLS_1_C;
                end if;
-               v.state  := WRITE;
-               v.clkSel := clkSel;
-               v.trg    := '1';
+               v.nextState  := WRITE;
+               v.state      := READ_TCA;
+               v.pc         := PC_READ_TCA_C;
+               v.clkSel     := clkSel;
+               v.trg        := '1';
             end if;
 
       end case;
