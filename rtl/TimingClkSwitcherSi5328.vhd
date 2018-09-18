@@ -107,23 +107,23 @@ architecture TimingClkSwitcherSi5328 of TimingClkSwitcher is
 
    constant PRG_WRITE_LCLS_2_C    : AxiLiteProgramArray := (
       -- set new frequency
-       0 => clkWr(  2, x"52", false ), -- BWsel    (dspllsim)
-       1 => clkWr( 25, x"60", false ), -- N1_HS    (dspllsim)
+       0 => clkWr(  2, x"42", false ), -- BWsel    (dspllsim)
+       1 => clkWr( 25, x"C0", false ), -- N1_HS    (dspllsim)
        2 => clkWr( 31, x"00", false ), -- NC1_LS   (dspllsim)
        3 => clkWr( 32, x"00", false ), -- NC1_LS   (dspllsim)
        4 => clkWr( 33, x"01", false ), -- NC1_LS   (dspllsim)
        5 => clkWr( 34, x"00", false ), -- NC2_LS   (dspllsim)
        6 => clkWr( 35, x"00", false ), -- NC2_LS   (dspllsim)
        7 => clkWr( 36, x"01", false ), -- NC2_LS   (dspllsim)
-       8 => clkWr( 40, x"20", false ), -- N2_HS/LS (dspllsim)
-       9 => clkWr( 41, x"48", false ), -- N2_LS    (dspllsim)
-      10 => clkWr( 42, x"d5", false ), -- N2_LS    (dspllsim)
+       8 => clkWr( 40, x"60", false ), -- N2_HS/LS (dspllsim)
+       9 => clkWr( 41, x"59", false ), -- N2_LS    (dspllsim)
+      10 => clkWr( 42, x"F9", false ), -- N2_LS    (dspllsim)
       11 => clkWr( 43, x"00", false ), -- N31      (dspllsim)
-      12 => clkWr( 44, x"08", false ), -- N31      (dspllsim)
-      13 => clkWr( 45, x"00", false ), -- N31      (dspllsim)
+      12 => clkWr( 44, x"0E", false ), -- N31      (dspllsim)
+      13 => clkWr( 45, x"A4", false ), -- N31      (dspllsim)
       14 => clkWr( 46, x"00", false ), -- N32      (dspllsim)
-      15 => clkWr( 47, x"08", false ), -- N32      (dspllsim)
-      16 => clkWr( 48, x"00", false ), -- N32      (dspllsim)
+      15 => clkWr( 47, x"0E", false ), -- N32      (dspllsim)
+      16 => clkWr( 48, x"A4", false ), -- N32      (dspllsim)
       17 => clkWr(136, x"40", true  )  -- ICAL
    );
 
