@@ -29,7 +29,6 @@ use ieee.numeric_std.all;
 
 use work.StdRtlPkg.all;
 use work.AxiLitePkg.all;
-use work.AxiLiteMasterPkg.all;
 use work.AxiLiteSequencerPkg.all;
 
 architecture TimingClkSwitcherSi5328 of TimingClkSwitcher is
