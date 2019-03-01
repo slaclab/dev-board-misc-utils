@@ -3,7 +3,6 @@ VIVADO=/opt/Xilinx/Vivado/2017.4/data/vhdl/src/unisims/
 SRCS  = StdRtlPkg.vhd
 SRCS += TextUtilPkg.vhd
 SRCS += AxiLitePkg.vhd
-SRCS += AxiLiteMasterPkg.vhd
 SRCS += AxiLiteMaster.vhd
 SRCS += AxiLiteRegs.vhd
 SRCS += AxiLiteSequencerPkg.vhd

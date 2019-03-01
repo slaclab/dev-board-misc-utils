@@ -19,7 +19,6 @@ use ieee.numeric_std.all;
 
 use work.StdRtlPkg.all;
 use work.AxiLitePkg.all;
-use work.AxiLiteMasterPkg.all;
 use work.I2cPkg.all;
 
 library unisim;
