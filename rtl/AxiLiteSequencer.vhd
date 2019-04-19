@@ -19,7 +19,6 @@ use ieee.numeric_std.all;
 
 use work.StdRtlPkg.all;
 use work.AxiLitePkg.all;
-use work.AxiLiteMasterPkg.all;
 use work.AxiLiteSequencerPkg.all;
 
 entity AxiLiteSequencer is
@@ -69,7 +68,7 @@ architecture AxiLiteSequencerImpl of AxiLiteSequencer is
 
    signal r   : RegType := REG_INIT_C;
    signal rin : RegType;
-   signal ack : AxiLiteMasterAckType;
+   signal ack : AxiLiteAckType;
 
 begin
 
