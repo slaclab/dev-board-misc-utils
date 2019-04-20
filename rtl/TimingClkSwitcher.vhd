@@ -19,7 +19,6 @@ use ieee.numeric_std.all;
 
 use work.StdRtlPkg.all;
 use work.AxiLitePkg.all;
-use work.AxiLiteMasterPkg.all;
 use work.AxiLiteSequencerPkg.all;
 
 entity TimingClkSwitcher is
@@ -44,8 +43,7 @@ entity TimingClkSwitcher is
       mAxilWriteSlave        : in  AxiLiteWriteSlaveType;
 
       sAxilReadMaster        : in  AxiLiteReadMasterType  := AXI_LITE_READ_MASTER_INIT_C;
-      sAxilReadSlave         : out AxiLiteReadSlaveType;
+      sAxilReadSlave         : out AxiLiteReadSlaveType   := AXI_LITE_READ_SLAVE_EMPTY_DECERR_C;
       sAxilWriteMaster       : in  AxiLiteWriteMasterType := AXI_LITE_WRITE_MASTER_INIT_C;
-      sAxilWriteSlave        : out AxiLiteWriteSlaveType
-   );
+      sAxilWriteSlave        : out AxiLiteWriteSlaveType  := AXI_LITE_WRITE_SLAVE_EMPTY_DECERR_C);
 end entity TimingClkSwitcher;

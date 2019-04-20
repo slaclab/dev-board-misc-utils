@@ -19,17 +19,16 @@ use ieee.numeric_std.all;
 
 use work.StdRtlPkg.all;
 use work.AxiLitePkg.all;
-use work.AxiLiteMasterPkg.all;
 
 package AxiLiteSequencerPkg is
 
    type AxiLiteInstructionType is record
-      req : AxiLiteMasterReqType;
+      req : AxiLiteReqType;
       lst : boolean;
    end record AxiLiteInstructionType;
 
    constant AXI_LITE_INSTRUCTION_INIT_C : AxiLiteInstructionType := (
-      req => AXI_LITE_MASTER_REQ_INIT_C,
+      req => AXI_LITE_REQ_INIT_C,
       lst => true
    );
 
