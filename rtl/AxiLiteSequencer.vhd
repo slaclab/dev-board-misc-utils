@@ -17,9 +17,12 @@ library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 
-use work.StdRtlPkg.all;
-use work.AxiLitePkg.all;
-use work.AxiLiteSequencerPkg.all;
+library surf;
+use surf.StdRtlPkg.all;
+use surf.AxiLitePkg.all;
+
+library dev_board_misc_utils;
+use dev_board_misc_utils.AxiLiteSequencerPkg.all;
 
 entity AxiLiteSequencer is
    generic (
@@ -122,7 +125,7 @@ begin
       end if;
    end process P_SEQ;
 
-   U_MASTER : entity work.AxiLiteMaster
+   U_MASTER : entity surf.AxiLiteMaster
       generic map (
          TPD_G           => TPD_G
       )

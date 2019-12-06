@@ -18,8 +18,11 @@ use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 use ieee.math_real.all;
 
-use work.StdRtlPkg.all;
-use work.AxiLitePkg.all;
+library surf;
+use surf.StdRtlPkg.all;
+use surf.AxiLitePkg.all;
+
+library dev_board_misc_utils;
 
 entity AxilFanController is
    generic (
@@ -100,7 +103,7 @@ begin
       rin <= v;
    end process P_COMB;
 
-   U_CTLR : entity work.FanController
+   U_CTLR : entity dev_board_misc_utils.FanController
       generic map (
          TPD_G              => TPD_G,
          SYSMON_BASE_ADDR_G => SYSMON_BASE_ADDR_G,

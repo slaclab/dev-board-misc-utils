@@ -17,9 +17,12 @@ library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 
-use work.StdRtlPkg.all;
-use work.TextUtilPkg.all;
-use work.AxiLitePkg.all;
+library surf;
+use surf.StdRtlPkg.all;
+use surf.AxiLitePkg.all;
+use surf.TextUtilPkg.all;
+
+library dev_board_misc_utils;
 
 entity FanControllerTb is
 end entity FanControllerTb;
@@ -107,7 +110,7 @@ begin
 
    rr(0) <= rbk;
 
-   U_DUT : entity work.AxilFanController
+   U_DUT : entity dev_board_misc_utils.AxilFanController
       generic map (
          TPD_G              => TPD_C,
          SYSMON_BASE_ADDR_G => x"0000_0000",
@@ -128,7 +131,7 @@ begin
          fanPwm           => pwm
       );
 
-   U_REGS : entity work.AxiLiteRegs
+   U_REGS : entity surf.AxiLiteRegs
       generic map (
          TPD_G          => TPD_C,
          NUM_READ_REG_G => RR_C

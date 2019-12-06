@@ -17,10 +17,13 @@ library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 
-use work.StdRtlPkg.all;
-use work.AxiLitePkg.all;
-use work.AxiLiteMasterPkg.all;
-use work.AxiLiteSequencerPkg.all;
+library surf;
+use surf.StdRtlPkg.all;
+use surf.AxiLitePkg.all;
+use surf.AxiLiteMasterPkg.all;
+
+library dev_board_misc_utils;
+use dev_board_misc_utils.AxiLiteSequencerPkg.all;
 
 entity AxiLiteSequencerTb is
 end entity AxiLiteSequencerTb;
@@ -185,7 +188,7 @@ begin
    end if;
    end process P_SEQ;
 
-   U_DUT : entity work.AxiLiteSequencer
+   U_DUT : entity dev_board_misc_utils.AxiLiteSequencer
       port map (
          axilClk         => clk,
          axilRst         => rst,
@@ -203,7 +206,7 @@ begin
          axilReadSlave   => axilReadSlave
       );
 
-   U_SLV : entity work.AxiLiteRegs
+   U_SLV : entity surf.AxiLiteRegs
       generic map (
          NUM_WRITE_REG_G => 4,
          NUM_READ_REG_G  => 4

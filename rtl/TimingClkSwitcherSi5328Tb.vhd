@@ -17,11 +17,14 @@ library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 
-use work.StdRtlPkg.all;
-use work.TextUtilPkg.all;
-use work.AxiLitePkg.all;
-use work.AxiLiteMasterPkg.all;
-use work.I2cPkg.all;
+library surf;
+use surf.StdRtlPkg.all;
+use surf.TextUtilPkg.all;
+use surf.AxiLitePkg.all;
+use surf.AxiLiteMasterPkg.all;
+use surf.I2cPkg.all;
+
+library dev_board_misc_utils;
 
 library unisim;
 use unisim.vcomponents.all;
@@ -121,7 +124,7 @@ begin
    end process P_RD;
 
 
-   U_DUT : entity work.TimingClkSwitcher(TimingClkSwitcherSi5328)
+   U_DUT : entity dev_board_misc_utils.TimingClkSwitcher(TimingClkSwitcherSi5328)
       generic map (
          TPD_G                  => TPD_C,
          CLOCK_AXIL_BASE_ADDR_G => x"0000_0400",
@@ -177,7 +180,7 @@ begin
       end if;
    end process P_CNT;
 
-   U_I2CM : entity work.AxiI2cRegMaster
+   U_I2CM : entity surf.AxiI2cRegMaster
       generic map (
          TPD_G           => TPD_C,
          DEVICE_MAP_G    => DEVMAP_C,
@@ -244,7 +247,7 @@ begin
    sda <= 'H';
    scl <= 'H';
 
-   U_Slv : entity work.I2cRegSlave
+   U_Slv : entity surf.I2cRegSlave
       generic map (
          TPD_G       => TPD_C,
          I2C_ADDR_G  => I2C_ADDR_C,
@@ -264,7 +267,7 @@ begin
          i2co   => i2co
       );
 
-   U_Tca : entity work.I2cRegSlave
+   U_Tca : entity surf.I2cRegSlave
       generic map (
          TPD_G       => TPD_C,
          I2C_ADDR_G  => (I2C_ADDR_C+1),
