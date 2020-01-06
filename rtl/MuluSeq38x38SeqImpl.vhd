@@ -13,13 +13,15 @@
 -- the terms contained in the LICENSE.txt file.
 -------------------------------------------------------------------------------
 
+library dev_board_misc_utils;
+
 architecture SeqImpl of MuluSeq38x38 is
 
    constant WIDTH_C : positive := 38;
 
 begin
 
-   U_Mul : entity work.MuluSeq
+   U_Mul : entity dev_board_misc_utils.MuluSeq
       generic map (
          TPD_G    => TPD_G,
          WIDTH_G  => WIDTH_C

@@ -17,9 +17,13 @@ library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 use ieee.math_real.all;
-use work.StdRtlPkg.all;
-use work.AxiLitePkg.all;
-use work.AxiLiteSequencerPkg.all;
+
+library surf;
+use surf.StdRtlPkg.all;
+use surf.AxiLitePkg.all;
+
+library dev_board_misc_utils;
+use dev_board_misc_utils.AxiLiteSequencerPkg.all;
 
 --
 -- fan speed is controlled by proportional feedback:
@@ -200,7 +204,7 @@ begin
       rin <= v;
    end process P_COMB;
 
-   U_READ_TEMP : entity work.AxiLiteSequencer
+   U_READ_TEMP : entity dev_board_misc_utils.AxiLiteSequencer
       generic map (
          TPD_G           => TPD_G
       )
@@ -221,7 +225,7 @@ begin
          axilReadSlave   => axilReadSlave
       );
 
-   U_MULT : entity work.MuluSeq
+   U_MULT : entity dev_board_misc_utils.MuluSeq
       generic map (
          TPD_G           => TPD_G,
          WIDTH_G         => MULU_W_C
@@ -237,7 +241,7 @@ begin
          don             => mulDon
       );
 
-   U_PWM : entity work.PWMController
+   U_PWM : entity dev_board_misc_utils.PWMController
       generic map (
          TPD_G           => TPD_G,
          PRESC_G         => PWM_PRESC_C,

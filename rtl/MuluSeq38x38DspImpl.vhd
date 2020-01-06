@@ -17,6 +17,8 @@ library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 
+library dev_board_misc_utils;
+
 -- multiply two unsigned 38-bit words with some
 -- truncation:
 --
@@ -183,7 +185,7 @@ begin
       end if;
    end process P_SEQ;
 
-   U_DSP : entity work.MuluSeq21x17Dsp(DspInferred)
+   U_DSP : entity dev_board_misc_utils.MuluSeq21x17Dsp(DspInferred)
       generic map (
          TPD_G           => TPD_G
       )

@@ -17,6 +17,8 @@ library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 
+library dev_board_misc_utils;
+
 entity MuluSeq38x38Tb is
 end entity MuluSeq38x38Tb;
 
@@ -113,7 +115,7 @@ begin
    end process P_CNT;
 
 
-   U_DUT : entity work.MuluSeq38x38(SeqImpl)
+   U_DUT : entity dev_board_misc_utils.MuluSeq38x38(SeqImpl)
       port map (
          clk => clk,
          rst => rst,
